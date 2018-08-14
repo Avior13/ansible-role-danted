@@ -1,0 +1,69 @@
+
+user.privileged:   root
+user.unprivileged: nobody
+socksmethod:       none
+logoutput:         /var/log/sockd.log
+connecttimeout: 60
+
+
+
+#################################################
+#Check auto settings if true discovery all eth interfaces
+{% if auto_settings == true %}
+
+
+{% if ansible_interfaces|length > 2 %}
+{% for in_interface in ansible_interfaces if in_interface != 'lo' and in_interface != 'gretap0' and in_interface != 'gre0' %}
+internal: {{ in_interface|replace('_',':') }} port = 1080
+{% endfor %}
+{% endif %}
+#################################################
+
+{% if ansible_interfaces|length > 2 %}
+{% for ex_interface in ansible_interfaces if ex_interface != 'lo' and ex_interface != 'gretap0' and ex_interface != 'gre0'  %}
+external: {{ ex_interface|replace('_',':') }}
+{% endfor %}
+{% endif %}
+
+
+#else manual settings
+{% else %}
+internal: eth0 port = 1080
+external: eth0
+
+{% endif %}
+
+external.rotation: same-same
+
+
+client pass {
+	from: 0.0.0.0/0 port 1-65535 to: 0.0.0.0/0
+}
+client block {
+        from: 0.0.0.0/0 to: 0.0.0.0/0
+        log: connect error
+}
+socks pass {
+       from: 0.0.0.0/0 to: 0.0.0.0/0
+       protocol: tcp udp
+}
+
+{% for p in client_pass %}
+client pass {
+	from: {{p.ip}} port 1-65535 to: 0.0.0.0/0
+}
+{% endfor %}
+
+{% for p in client_block %}
+client block {
+        from: {{p.ip}} to: 0.0.0.0/0
+        log: connect error
+}
+{% endfor %}
+
+{% for p in socks_pass %}
+socks pass {
+       from: {{p.ip}} to: 0.0.0.0/0
+       protocol: tcp udp
+}
+{% endfor %}

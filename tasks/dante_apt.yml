@@ -1,0 +1,24 @@
+---
+- name: Install dante-server
+  apt: name=dante-server state=present update_cache=yes cache_valid_time=3600
+  become: yes
+
+- name: "Configure sockd"
+  template: src=sockd.conf.j2
+            dest=/etc/sockd.conf
+            owner=root
+            group=root
+            mode=0644
+
+- name: Add Service Script
+  copy: src=sockd.init dest=/etc/init.d/sockd mode="u+x,g+x,o+x"
+  become: yes
+
+- name: Enable Service
+  command: update-rc.d danted defaults
+  become: yes
+
+- name: restart danted
+  service: name=danted
+           state=restarted
+  become: yes

@@ -1,0 +1,13 @@
+---
+#- command: echo "{{ item }}"
+#  with_items: ansible_all_ipv4_addresses
+- name: "Install the correct version x64-x86"
+  include: "dante_make.yml"
+  when: ansible_machine == "x86_64"
+
+- name: "Install the correct version ARM"
+  include: "dante_apt.yml"
+  when: ansible_machine == "aarch64"
+
+
+#  when: dante_current.stdout.find('v{{ dante_version }}') == -1

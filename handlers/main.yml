@@ -1,0 +1,6 @@
+---
+# handlers file for dante
+- name: restart sockd
+  service: name=sockd
+           state=restarted
+  become: yes
