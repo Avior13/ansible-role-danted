@@ -1,9 +1,8 @@
-# ansible-role-danted
+## ansible-role-danted
 Ansible Role: Dante (Socks Server)
-Requirements
+## Requirements
 Debian 7 8 9 x86-65 ARM
-Role Variables
----
+## Role Variables
 dante_version: 1.4.2
 dante_working_dir: /tmp
 auto_settings: true
